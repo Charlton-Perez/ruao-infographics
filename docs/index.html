@@ -7,7 +7,7 @@
 <style>
   :root {
     --ink: #2b2118; --bg: #faf7f2; --sub: #6a5c4c; --mute: #9a8c7a;
-    --maroon: #8e0915; --line: #e6ded4;
+    --maroon: #8e0915; --line: #e6ded4; --card: #ffffff;
   }
   * { box-sizing: border-box; }
   body {
@@ -20,27 +20,47 @@
   }
   header h1 { margin: 0; font-size: 1.25rem; }
   header p { margin: 4px 0 0; font-size: 0.85rem; opacity: 0.85; }
-  main { max-width: 1100px; margin: 0 auto; padding: 20px 16px 60px; }
-  .combined { margin-bottom: 36px; }
-  .combined img, .panel img {
-    width: 100%; height: auto; display: block; border-radius: 8px;
-    box-shadow: 0 1px 6px rgba(0,0,0,0.08);
-  }
-  h2 { font-size: 1.05rem; margin: 0 0 12px; color: var(--maroon); }
+  main { max-width: 1100px; margin: 0 auto; padding: 24px 16px 60px; }
+  section { margin-bottom: 40px; }
+  h2 { font-size: 1.05rem; margin: 0 0 4px; color: var(--maroon); }
+  .section-sub { font-size: 0.85rem; color: var(--sub); margin: 0 0 16px; }
   .grid {
     display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
   }
-  .panel a { text-decoration: none; color: inherit; }
+  .panel img {
+    width: 100%; height: auto; display: block; border-radius: 8px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.08); background: #fff;
+  }
   .panel span {
     display: block; margin-top: 6px; font-size: 0.82rem; color: var(--sub);
   }
+  #updated { font-size: 0.8rem; color: var(--mute); margin-top: 14px; }
+
+  /* Downloads */
+  .downloads {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 18px 20px;
+  }
+  .downloads p.help {
+    font-size: 0.85rem; color: var(--sub); margin: 0 0 14px; line-height: 1.5;
+  }
+  .dl-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  select#dl-select {
+    flex: 1; min-width: 220px; padding: 9px 10px; font-size: 0.9rem;
+    border: 1px solid #ccc; border-radius: 8px; background: #fff; color: var(--ink);
+  }
+  button#dl-btn {
+    background: var(--maroon); color: #fff; border: none; border-radius: 8px;
+    padding: 9px 20px; font-size: 0.9rem; font-weight: 600; cursor: pointer;
+  }
+  button#dl-btn:hover { background: #6f0710; }
+
   footer {
     max-width: 1100px; margin: 0 auto; padding: 0 16px 40px;
     font-size: 0.78rem; color: var(--mute); line-height: 1.6;
   }
   footer a { color: var(--maroon); }
-  #updated { font-size: 0.82rem; color: var(--mute); margin-top: 2px; }
 </style>
 </head>
 <body>
@@ -49,21 +69,42 @@
     <p>Reading University Atmospheric Observatory · regenerated daily from the live record</p>
   </header>
   <main>
-    <section class="combined">
-      <h2>Full comparison</h2>
-      <a href="hot_days_30.png"><img src="hot_days_30.png" alt="2026 vs 1976 combined infographic"></a>
+    <section>
+      <h2>The six panels</h2>
+      <p class="section-sub">Each ranks 2026 against the iconic summer of 1976 — hot (30°C+ days), dry (rain days), and sunny (bright-sunshine days) — with the decade-by-decade trend beneath each.</p>
+      <div class="grid" id="panel-grid">
+        <div class="panel"><img src="hot_days_1976/panels/hot_ranking.png" alt="Years ranked by 30°C+ days"><span>Years ranked by 30°C+ days</span></div>
+        <div class="panel"><img src="hot_days_1976/panels/dry_ranking.png" alt="Driest summers ranked"><span>Driest summers ranked by fewest rain days</span></div>
+        <div class="panel"><img src="hot_days_1976/panels/sunny_ranking.png" alt="Sunniest summers ranked"><span>Sunniest summers ranked by very sunny days</span></div>
+        <div class="panel"><img src="hot_days_1976/panels/hot_decade.png" alt="30°C+ days per decade"><span>30°C+ days per decade</span></div>
+        <div class="panel"><img src="hot_days_1976/panels/dry_decade.png" alt="Average dry days per decade"><span>Average dry days per summer, per decade</span></div>
+        <div class="panel"><img src="hot_days_1976/panels/sunny_decade.png" alt="Average sunshine hours per decade"><span>Average summer sunshine hours, per decade</span></div>
+      </div>
       <p id="updated"></p>
     </section>
 
     <section>
-      <h2>Individual panels</h2>
-      <div class="grid">
-        <div class="panel"><a href="panels/hot_ranking.png"><img src="panels/hot_ranking.png" alt="Years ranked by 30°C+ days"></a><span>Years ranked by 30°C+ days</span></div>
-        <div class="panel"><a href="panels/dry_ranking.png"><img src="panels/dry_ranking.png" alt="Driest summers ranked"></a><span>Driest summers ranked by fewest rain days</span></div>
-        <div class="panel"><a href="panels/sunny_ranking.png"><img src="panels/sunny_ranking.png" alt="Sunniest summers ranked"></a><span>Sunniest summers ranked by very sunny days</span></div>
-        <div class="panel"><a href="panels/hot_decade.png"><img src="panels/hot_decade.png" alt="30°C+ days per decade"></a><span>30°C+ days per decade</span></div>
-        <div class="panel"><a href="panels/dry_decade.png"><img src="panels/dry_decade.png" alt="Average dry days per decade"></a><span>Average dry days per summer, per decade</span></div>
-        <div class="panel"><a href="panels/sunny_decade.png"><img src="panels/sunny_decade.png" alt="Average sunshine hours per decade"></a><span>Average summer sunshine hours, per decade</span></div>
+      <h2>Downloads</h2>
+      <div class="downloads">
+        <p class="help">
+          Want to save one of these, or use it in a slide or report? Pick a version from
+          the list below and click <strong>Download</strong> — it saves as a PNG image
+          straight to your device (on a phone, it usually lands in Photos/Downloads).
+          "Full comparison" is all six panels together as one image; the rest are each
+          panel on its own, cropped tight with no title banner.
+        </p>
+        <div class="dl-row">
+          <select id="dl-select">
+            <option value="hot_days_1976/hot_days_30.png">Full comparison — all six panels</option>
+            <option value="hot_days_1976/panels/hot_ranking.png">Hot — years ranked by 30°C+ days</option>
+            <option value="hot_days_1976/panels/dry_ranking.png">Dry — driest summers ranked</option>
+            <option value="hot_days_1976/panels/sunny_ranking.png">Sunny — sunniest summers ranked</option>
+            <option value="hot_days_1976/panels/hot_decade.png">Hot — 30°C+ days per decade</option>
+            <option value="hot_days_1976/panels/dry_decade.png">Dry — average dry days per decade</option>
+            <option value="hot_days_1976/panels/sunny_decade.png">Sunny — average sunshine hours per decade</option>
+          </select>
+          <button id="dl-btn">Download</button>
+        </div>
       </div>
     </section>
   </main>
@@ -75,11 +116,23 @@
     Beta — provided as is, with no warranty.
   </footer>
   <script>
-    fetch('hot_days_30.png', { method: 'HEAD' }).then(r => {
+    fetch('hot_days_1976/hot_days_30.png', { method: 'HEAD' }).then(r => {
       const lm = r.headers.get('last-modified');
       if (lm) document.getElementById('updated').textContent =
         'Last regenerated: ' + new Date(lm).toUTCString();
     }).catch(() => {});
+
+    document.getElementById('dl-btn').addEventListener('click', () => {
+      const sel = document.getElementById('dl-select');
+      const url = sel.value;
+      const filename = url.split('/').pop();
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    });
   </script>
 </body>
 </html>

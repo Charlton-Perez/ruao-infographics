@@ -29,9 +29,22 @@ jobs:
       - name: Install dependencies
         run: pip install -r scripts/requirements.txt
 
-      - name: Generate infographics
-        run: python hot_days_30.py
-        working-directory: scripts
+      - name: Generate every infographic
+        # Runs every .py script found directly inside each scripts/<name>/ folder
+        # (skipping scripts/common/, which just holds the shared data loader).
+        # Adding a new infographic = adding a new scripts/<name>/ folder; nothing
+        # here needs to change.
+        run: |
+          set -e
+          for dir in scripts/*/; do
+            name=$(basename "$dir")
+            [ "$name" = "common" ] && continue
+            for script in "$dir"*.py; do
+              [ -e "$script" ] || continue
+              echo "── Running $script ──"
+              (cd "$dir" && python "$(basename "$script")")
+            done
+          done
 
       - name: Commit and push if changed
         run: |

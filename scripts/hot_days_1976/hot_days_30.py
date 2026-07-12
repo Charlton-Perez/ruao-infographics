@@ -12,9 +12,13 @@ a per-year ranking below, with 1976 highlighted and the current (partial) year
 shown in grey.
 
 Run:  python hot_days_30.py
-Output: ../docs/hot_days_30.png (+ ../docs/panels/*.png), served by GitHub Pages.
+Output: ../../docs/hot_days_1976/hot_days_30.png (+ panels/*.png), served by GitHub Pages.
+
+This is one infographic among possibly several in this repo — see scripts/common/
+for the shared data loader and scripts/<name>/ for each infographic's own folder.
 """
 
+import sys
 from datetime import date
 from pathlib import Path
 import numpy as np
@@ -36,6 +40,7 @@ matplotlib.rcParams["font.sans-serif"] = [
     "Avenir Next", "Mukta", "Helvetica Neue", "Arial", "Liberation Sans", "DejaVu Sans",
 ]
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "common"))
 from data_utils import load_daily, coverage
 
 # ── Analysis parameters ───────────────────────────────────────────────────────
@@ -51,7 +56,8 @@ SUN_MONTHS = [6, 7, 8]            # meteorological summer (sunshine recorded sin
 TOP_N_HOT = 14
 TOP_N_DRY = 13
 TOP_N_SUN = 13
-OUT = Path(__file__).resolve().parent.parent / "docs" / "hot_days_30.png"
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+OUT = REPO_ROOT / "docs" / "hot_days_1976" / "hot_days_30.png"
 ASSETS = Path(__file__).resolve().parent / "assets"
 OBS_URL = "https://research.reading.ac.uk/meteorology/atmospheric-observatory/"
 
