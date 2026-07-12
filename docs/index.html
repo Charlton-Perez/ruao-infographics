@@ -15,37 +15,18 @@
     font-family: Arial, Helvetica, "Helvetica Neue", sans-serif;
     -webkit-font-smoothing: antialiased;
   }
-  header {
-    background: var(--maroon); color: #fff; padding: 18px 20px;
-  }
-  header h1 { margin: 0; font-size: 1.25rem; }
-  header p { margin: 4px 0 0; font-size: 0.85rem; opacity: 0.85; }
-  main { max-width: 1100px; margin: 0 auto; padding: 24px 16px 60px; }
-  section { margin-bottom: 40px; }
-  h2 { font-size: 1.05rem; margin: 0 0 4px; color: var(--maroon); }
-  .section-sub { font-size: 0.85rem; color: var(--sub); margin: 0 0 16px; }
-  .grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-  }
-  .panel img {
+  main { max-width: 1200px; margin: 0 auto; padding: 24px 16px 40px; }
+
+  .combined img {
     width: 100%; height: auto; display: block; border-radius: 8px;
     box-shadow: 0 1px 6px rgba(0,0,0,0.08); background: #fff;
   }
-  .panel span {
-    display: block; margin-top: 6px; font-size: 0.82rem; color: var(--sub);
-  }
-  #updated { font-size: 0.8rem; color: var(--mute); margin-top: 14px; }
+  #updated { font-size: 0.78rem; color: var(--mute); margin: 10px 0 28px; }
 
-  /* Downloads */
   .downloads {
-    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
-    padding: 18px 20px;
+    display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+    margin-bottom: 36px;
   }
-  .downloads p.help {
-    font-size: 0.85rem; color: var(--sub); margin: 0 0 14px; line-height: 1.5;
-  }
-  .dl-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
   select#dl-select {
     flex: 1; min-width: 220px; padding: 9px 10px; font-size: 0.9rem;
     border: 1px solid #ccc; border-radius: 8px; background: #fff; color: var(--ink);
@@ -57,64 +38,56 @@
   button#dl-btn:hover { background: #6f0710; }
 
   footer {
-    max-width: 1100px; margin: 0 auto; padding: 0 16px 40px;
-    font-size: 0.78rem; color: var(--mute); line-height: 1.6;
+    max-width: 1200px; margin: 0 auto; padding: 20px 16px 40px;
+    border-top: 1px solid var(--line);
   }
-  footer a { color: var(--maroon); }
+  .footer-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .cc-link { flex-shrink: 0; line-height: 0; }
+  .cc-badge { height: 31px; width: auto; display: block; }
+  .footer-text {
+    flex: 1; min-width: 240px; font-size: 0.78rem; line-height: 1.55; color: var(--mute);
+  }
+  .footer-text a { color: var(--maroon); text-decoration: none; }
+  .footer-text a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
-  <header>
-    <h1>2026 vs 1976 — a hot, dry, sunny summer?</h1>
-    <p>Reading University Atmospheric Observatory · regenerated daily from the live record</p>
-  </header>
   <main>
-    <section>
-      <h2>The six panels</h2>
-      <p class="section-sub">Each ranks 2026 against the iconic summer of 1976 — hot (30°C+ days), dry (rain days), and sunny (bright-sunshine days) — with the decade-by-decade trend beneath each.</p>
-      <div class="grid" id="panel-grid">
-        <div class="panel"><img src="hot_days_1976/panels/hot_ranking.png" alt="Years ranked by 30°C+ days"><span>Years ranked by 30°C+ days</span></div>
-        <div class="panel"><img src="hot_days_1976/panels/dry_ranking.png" alt="Driest summers ranked"><span>Driest summers ranked by fewest rain days</span></div>
-        <div class="panel"><img src="hot_days_1976/panels/sunny_ranking.png" alt="Sunniest summers ranked"><span>Sunniest summers ranked by very sunny days</span></div>
-        <div class="panel"><img src="hot_days_1976/panels/hot_decade.png" alt="30°C+ days per decade"><span>30°C+ days per decade</span></div>
-        <div class="panel"><img src="hot_days_1976/panels/dry_decade.png" alt="Average dry days per decade"><span>Average dry days per summer, per decade</span></div>
-        <div class="panel"><img src="hot_days_1976/panels/sunny_decade.png" alt="Average sunshine hours per decade"><span>Average summer sunshine hours, per decade</span></div>
-      </div>
-      <p id="updated"></p>
-    </section>
+    <div class="combined">
+      <img src="hot_days_1976/hot_days_30.png" alt="2026 vs 1976 — a hot, dry, sunny summer? Full comparison">
+    </div>
+    <p id="updated"></p>
 
-    <section>
-      <h2>Downloads</h2>
-      <div class="downloads">
-        <p class="help">
-          Want to save one of these, or use it in a slide or report? Pick a version from
-          the list below and click <strong>Download</strong> — it saves as a PNG image
-          straight to your device (on a phone, it usually lands in Photos/Downloads).
-          "Full comparison" is all six panels together as one image; the rest are each
-          panel on its own, cropped tight with no title banner.
-        </p>
-        <div class="dl-row">
-          <select id="dl-select">
-            <option value="hot_days_1976/hot_days_30.png">Full comparison — all six panels</option>
-            <option value="hot_days_1976/panels/hot_ranking.png">Hot — years ranked by 30°C+ days</option>
-            <option value="hot_days_1976/panels/dry_ranking.png">Dry — driest summers ranked</option>
-            <option value="hot_days_1976/panels/sunny_ranking.png">Sunny — sunniest summers ranked</option>
-            <option value="hot_days_1976/panels/hot_decade.png">Hot — 30°C+ days per decade</option>
-            <option value="hot_days_1976/panels/dry_decade.png">Dry — average dry days per decade</option>
-            <option value="hot_days_1976/panels/sunny_decade.png">Sunny — average sunshine hours per decade</option>
-          </select>
-          <button id="dl-btn">Download</button>
-        </div>
-      </div>
-    </section>
+    <div class="downloads">
+      <select id="dl-select">
+        <option value="hot_days_1976/hot_days_30.png">Full comparison — all six panels</option>
+        <option value="hot_days_1976/panels/hot_ranking.png">Hot — years ranked by 30°C+ days</option>
+        <option value="hot_days_1976/panels/dry_ranking.png">Dry — driest summers ranked</option>
+        <option value="hot_days_1976/panels/sunny_ranking.png">Sunny — sunniest summers ranked</option>
+        <option value="hot_days_1976/panels/hot_decade.png">Hot — 30°C+ days per decade</option>
+        <option value="hot_days_1976/panels/dry_decade.png">Dry — average dry days per decade</option>
+        <option value="hot_days_1976/panels/sunny_decade.png">Sunny — average sunshine hours per decade</option>
+      </select>
+      <button id="dl-btn">Download</button>
+    </div>
   </main>
+
   <footer>
-    Data collected by the University of Reading at the
-    <a href="https://research.reading.ac.uk/meteorology/atmospheric-observatory/" target="_blank" rel="noreferrer">Atmospheric Observatory</a>.
-    Figures regenerate automatically each day from the
-    <a href="https://github.com/Charlton-Perez/ask_observatory" target="_blank" rel="noreferrer">ask_observatory</a> daily record.
-    Beta — provided as is, with no warranty.
+    <div class="footer-row">
+      <a class="cc-link" href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer"
+         title="Creative Commons Attribution 4.0 International">
+        <img class="cc-badge" src="assets/cc-by.png" alt="Creative Commons BY 4.0">
+      </a>
+      <p class="footer-text">
+        Data &amp; figures &copy; University of Reading, licensed under
+        <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC&nbsp;BY&nbsp;4.0</a>.
+        Data collected at the
+        <a href="https://research.reading.ac.uk/meteorology/atmospheric-observatory/" target="_blank" rel="noreferrer">Atmospheric Observatory</a>.
+        Beta — provided as is, with no warranty.
+      </p>
+    </div>
   </footer>
+
   <script>
     fetch('hot_days_1976/hot_days_30.png', { method: 'HEAD' }).then(r => {
       const lm = r.headers.get('last-modified');
@@ -125,10 +98,9 @@
     document.getElementById('dl-btn').addEventListener('click', () => {
       const sel = document.getElementById('dl-select');
       const url = sel.value;
-      const filename = url.split('/').pop();
       const a = document.createElement('a');
       a.href = url;
-      a.download = filename;
+      a.download = url.split('/').pop();
       document.body.appendChild(a);
       a.click();
       a.remove();
