@@ -64,10 +64,11 @@ only the two `index.html` edits above are manual.
 
 ## Automatic regeneration
 
-A scheduled GitHub Action runs daily at **12:20 UTC** — 20 minutes after
-`ask_observatory`'s own data-fetch workflow, so it reliably picks up that
-day's new observation — regenerates every infographic, and commits the
-results if anything changed. It also runs on any push to `scripts/`, and can
+A scheduled GitHub Action runs **hourly from 10:15 to 15:15 UTC** — 15 minutes
+after each of `ask_observatory`'s own hourly data-fetch runs (10:00-15:00 UTC),
+so it reliably picks up that day's new observation whenever it lands within
+that window — regenerates every infographic, and commits the results if
+anything changed. It also runs on any push to `scripts/`, and can
 be triggered manually from the Actions tab.
 
 ## Run locally

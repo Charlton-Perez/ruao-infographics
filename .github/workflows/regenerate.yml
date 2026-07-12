@@ -2,9 +2,10 @@ name: Regenerate infographics
 
 on:
   schedule:
-    # 20 minutes after ask_observatory's daily data-fetch workflow (12:00 UTC),
-    # so this run picks up that day's new observation.
-    - cron: '20 12 * * *'
+    # Every hour from 10:15 to 15:15 UTC — 15 minutes after each of
+    # ask_observatory's hourly data-fetch runs (on the hour, 10:00-15:00),
+    # giving that job time to land before we regenerate from its data.
+    - cron: '15 10-15 * * *'
   workflow_dispatch:   # manual trigger from the Actions tab
   push:
     paths:
