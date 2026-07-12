@@ -6,9 +6,16 @@ daily weather record.
 
 **View it live:** https://Charlton-Perez.github.io/ruao-infographics/
 
+Each infographic has its own page and its own URL, e.g.:
+https://Charlton-Perez.github.io/ruao-infographics/hot_days_1976/
+
+The root page is just a landing page linking to each one with a short
+description.
+
 ## Structure
 
-Each infographic idea lives in its own subfolder, so new ones can be added
+Each infographic idea lives in its own subfolder — in `scripts/` for the
+generator and in `docs/` for its page and images — so new ones can be added
 without touching existing ones:
 
 ```
@@ -18,10 +25,13 @@ scripts/
     hot_days_30.py
     assets/           logo etc. used only by this infographic
 docs/                  GitHub Pages site (served from here)
-  index.html           the page — shows the six panels + a download picker
+  index.html           root landing page — links to each infographic below
+  assets/cc-by.png      shared CC-BY badge, used by the landing page
   hot_days_1976/
-    hot_days_30.png    combined figure (download-only, not shown on the page)
-    panels/*.png       the six individual panels (shown on the page)
+    index.html           this infographic's own page (its own URL)
+    hot_days_30.png       combined figure, shown on the page
+    panels/*.png          the six individual panels, download-only
+    assets/cc-by.png       its own copy of the badge (self-contained page)
 ```
 
 `scripts/common/data_utils.py` fetches `ruao_data.csv` straight from the
@@ -40,12 +50,17 @@ as current as that repo's daily update.
    ```
 2. Write output to `docs/<name>/...` (compute the path via
    `Path(__file__).resolve().parent.parent.parent / "docs" / "<name>"`).
-3. Add a section to `docs/index.html` (and an entry in the downloads
-   `<select>` if you want it downloadable).
+3. Copy `docs/hot_days_1976/index.html` as a starting point for
+   `docs/<name>/index.html` (update the image/download filenames and the
+   `<title>`) — this is what gives it its own URL,
+   `.../ruao-infographics/<name>/`.
+4. Add a `<a class="card" href="<name>/">` entry with a short description to
+   the root `docs/index.html`.
 
 The workflow (`.github/workflows/regenerate.yml`) automatically runs every
 `.py` file it finds directly inside each `scripts/<name>/` folder (it skips
-`scripts/common/`) — nothing needs to change there.
+`scripts/common/`) — nothing needs to change there for the image generation;
+only the two `index.html` edits above are manual.
 
 ## Automatic regeneration
 

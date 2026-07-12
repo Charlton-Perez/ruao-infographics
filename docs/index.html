@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>RUAO Infographics — 2026 vs 1976</title>
+<title>RUAO Infographics</title>
 <style>
   :root {
     --ink: #2b2118; --bg: #faf7f2; --sub: #6a5c4c; --mute: #9a8c7a;
@@ -15,30 +15,23 @@
     font-family: Arial, Helvetica, "Helvetica Neue", sans-serif;
     -webkit-font-smoothing: antialiased;
   }
-  main { max-width: 1200px; margin: 0 auto; padding: 24px 16px 40px; }
+  header { background: var(--maroon); color: #fff; padding: 18px 20px; }
+  header h1 { margin: 0; font-size: 1.25rem; }
+  header p { margin: 4px 0 0; font-size: 0.85rem; opacity: 0.85; }
 
-  .combined img {
-    width: 100%; height: auto; display: block; border-radius: 8px;
-    box-shadow: 0 1px 6px rgba(0,0,0,0.08); background: #fff;
-  }
-  #updated { font-size: 0.78rem; color: var(--mute); margin: 10px 0 28px; }
+  main { max-width: 900px; margin: 0 auto; padding: 24px 16px 20px; }
 
-  .downloads {
-    display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
-    margin-bottom: 36px;
+  .card {
+    display: block; background: var(--card); border: 1px solid var(--line);
+    border-radius: 10px; padding: 18px 20px; margin-bottom: 16px;
+    text-decoration: none; color: inherit;
   }
-  select#dl-select {
-    flex: 1; min-width: 220px; padding: 9px 10px; font-size: 0.9rem;
-    border: 1px solid #ccc; border-radius: 8px; background: #fff; color: var(--ink);
-  }
-  button#dl-btn {
-    background: var(--maroon); color: #fff; border: none; border-radius: 8px;
-    padding: 9px 20px; font-size: 0.9rem; font-weight: 600; cursor: pointer;
-  }
-  button#dl-btn:hover { background: #6f0710; }
+  .card:hover { border-color: var(--maroon); }
+  .card h2 { margin: 0 0 6px; font-size: 1.05rem; color: var(--maroon); }
+  .card p { margin: 0; font-size: 0.88rem; color: var(--sub); line-height: 1.5; }
 
   footer {
-    max-width: 1200px; margin: 0 auto; padding: 20px 16px 40px;
+    max-width: 900px; margin: 0 auto; padding: 14px 16px 30px;
     border-top: 1px solid var(--line);
   }
   .footer-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
@@ -52,24 +45,19 @@
 </style>
 </head>
 <body>
-  <main>
-    <div class="combined">
-      <img src="hot_days_1976/hot_days_30.png" alt="2026 vs 1976 — a hot, dry, sunny summer? Full comparison">
-    </div>
-    <p id="updated"></p>
+  <header>
+    <h1>RUAO Infographics</h1>
+    <p>Reading University Atmospheric Observatory · regenerated daily from the live record</p>
+  </header>
 
-    <div class="downloads">
-      <select id="dl-select">
-        <option value="hot_days_1976/hot_days_30.png">Full comparison — all six panels</option>
-        <option value="hot_days_1976/panels/hot_ranking.png">Hot — years ranked by 30°C+ days</option>
-        <option value="hot_days_1976/panels/dry_ranking.png">Dry — driest summers ranked</option>
-        <option value="hot_days_1976/panels/sunny_ranking.png">Sunny — sunniest summers ranked</option>
-        <option value="hot_days_1976/panels/hot_decade.png">Hot — 30°C+ days per decade</option>
-        <option value="hot_days_1976/panels/dry_decade.png">Dry — average dry days per decade</option>
-        <option value="hot_days_1976/panels/sunny_decade.png">Sunny — average sunshine hours per decade</option>
-      </select>
-      <button id="dl-btn">Download</button>
-    </div>
+  <main>
+    <a class="card" href="hot_days_1976/">
+      <h2>2026 vs 1976 — a hot, dry, sunny summer?</h2>
+      <p>Compares this year against the iconic summer of 1976 on three fronts —
+      30°C+ days, rain-free days, and hours of bright sunshine — with each
+      ranked against every other year and set against the long-term decade
+      trend.</p>
+    </a>
   </main>
 
   <footer>
@@ -87,24 +75,5 @@
       </p>
     </div>
   </footer>
-
-  <script>
-    fetch('hot_days_1976/hot_days_30.png', { method: 'HEAD' }).then(r => {
-      const lm = r.headers.get('last-modified');
-      if (lm) document.getElementById('updated').textContent =
-        'Last regenerated: ' + new Date(lm).toUTCString();
-    }).catch(() => {});
-
-    document.getElementById('dl-btn').addEventListener('click', () => {
-      const sel = document.getElementById('dl-select');
-      const url = sel.value;
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = url.split('/').pop();
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    });
-  </script>
 </body>
 </html>
