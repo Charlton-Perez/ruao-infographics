@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RUAO Infographics — 2026 vs 1976</title>
+<style>
+  :root {
+    --ink: #2b2118; --bg: #faf7f2; --sub: #6a5c4c; --mute: #9a8c7a;
+    --maroon: #8e0915; --line: #e6ded4;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: Arial, Helvetica, "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  header {
+    background: var(--maroon); color: #fff; padding: 18px 20px;
+  }
+  header h1 { margin: 0; font-size: 1.25rem; }
+  header p { margin: 4px 0 0; font-size: 0.85rem; opacity: 0.85; }
+  main { max-width: 1100px; margin: 0 auto; padding: 20px 16px 60px; }
+  .combined { margin-bottom: 36px; }
+  .combined img, .panel img {
+    width: 100%; height: auto; display: block; border-radius: 8px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+  }
+  h2 { font-size: 1.05rem; margin: 0 0 12px; color: var(--maroon); }
+  .grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  .panel a { text-decoration: none; color: inherit; }
+  .panel span {
+    display: block; margin-top: 6px; font-size: 0.82rem; color: var(--sub);
+  }
+  footer {
+    max-width: 1100px; margin: 0 auto; padding: 0 16px 40px;
+    font-size: 0.78rem; color: var(--mute); line-height: 1.6;
+  }
+  footer a { color: var(--maroon); }
+  #updated { font-size: 0.82rem; color: var(--mute); margin-top: 2px; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>2026 vs 1976 — a hot, dry, sunny summer?</h1>
+    <p>Reading University Atmospheric Observatory · regenerated daily from the live record</p>
+  </header>
+  <main>
+    <section class="combined">
+      <h2>Full comparison</h2>
+      <a href="hot_days_30.png"><img src="hot_days_30.png" alt="2026 vs 1976 combined infographic"></a>
+      <p id="updated"></p>
+    </section>
+
+    <section>
+      <h2>Individual panels</h2>
+      <div class="grid">
+        <div class="panel"><a href="panels/hot_ranking.png"><img src="panels/hot_ranking.png" alt="Years ranked by 30°C+ days"></a><span>Years ranked by 30°C+ days</span></div>
+        <div class="panel"><a href="panels/dry_ranking.png"><img src="panels/dry_ranking.png" alt="Driest summers ranked"></a><span>Driest summers ranked by fewest rain days</span></div>
+        <div class="panel"><a href="panels/sunny_ranking.png"><img src="panels/sunny_ranking.png" alt="Sunniest summers ranked"></a><span>Sunniest summers ranked by very sunny days</span></div>
+        <div class="panel"><a href="panels/hot_decade.png"><img src="panels/hot_decade.png" alt="30°C+ days per decade"></a><span>30°C+ days per decade</span></div>
+        <div class="panel"><a href="panels/dry_decade.png"><img src="panels/dry_decade.png" alt="Average dry days per decade"></a><span>Average dry days per summer, per decade</span></div>
+        <div class="panel"><a href="panels/sunny_decade.png"><img src="panels/sunny_decade.png" alt="Average sunshine hours per decade"></a><span>Average summer sunshine hours, per decade</span></div>
+      </div>
+    </section>
+  </main>
+  <footer>
+    Data collected by the University of Reading at the
+    <a href="https://research.reading.ac.uk/meteorology/atmospheric-observatory/" target="_blank" rel="noreferrer">Atmospheric Observatory</a>.
+    Figures regenerate automatically each day from the
+    <a href="https://github.com/Charlton-Perez/ask_observatory" target="_blank" rel="noreferrer">ask_observatory</a> daily record.
+    Beta — provided as is, with no warranty.
+  </footer>
+  <script>
+    fetch('hot_days_30.png', { method: 'HEAD' }).then(r => {
+      const lm = r.headers.get('last-modified');
+      if (lm) document.getElementById('updated').textContent =
+        'Last regenerated: ' + new Date(lm).toUTCString();
+    }).catch(() => {});
+  </script>
+</body>
+</html>
