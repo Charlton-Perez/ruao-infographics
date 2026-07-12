@@ -30,7 +30,7 @@ jobs:
         run: pip install -r scripts/requirements.txt
 
       - name: Generate infographics
-        run: python scripts/hot_days_30.py
+        run: python hot_days_30.py
         working-directory: scripts
 
       - name: Commit and push if changed
