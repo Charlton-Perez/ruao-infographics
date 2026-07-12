@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>RUAO Infographics</title>
+<title>2026 vs the hottest summers on record | RUAO Infographics</title>
 <style>
   :root {
     --ink: #2b2118; --bg: #faf7f2; --sub: #6a5c4c; --mute: #9a8c7a;
-    --maroon: #8e0915; --line: #e6ded4; --card: #ffffff;
+    --maroon: #8e0915; --line: #e6ded4;
   }
   * { box-sizing: border-box; }
   body {
@@ -15,23 +15,27 @@
     font-family: Arial, Helvetica, "Helvetica Neue", sans-serif;
     -webkit-font-smoothing: antialiased;
   }
-  header { background: var(--maroon); color: #fff; padding: 18px 20px; }
-  header h1 { margin: 0; font-size: 1.25rem; }
-  header p { margin: 4px 0 0; font-size: 0.85rem; opacity: 0.85; }
+  main { max-width: 1200px; margin: 0 auto; padding: 24px 16px 20px; }
 
-  main { max-width: 900px; margin: 0 auto; padding: 24px 16px 20px; }
+  .back { font-size: 0.82rem; margin-bottom: 14px; }
+  .back a { color: var(--maroon); text-decoration: none; }
+  .back a:hover { text-decoration: underline; }
 
-  .card {
-    display: block; background: var(--card); border: 1px solid var(--line);
-    border-radius: 10px; padding: 18px 20px; margin-bottom: 16px;
-    text-decoration: none; color: inherit;
+  .combined img {
+    width: 100%; height: auto; display: block; border-radius: 8px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.08); background: #fff;
   }
-  .card:hover { border-color: var(--maroon); }
-  .card h2 { margin: 0 0 6px; font-size: 1.05rem; color: var(--maroon); }
-  .card p { margin: 0; font-size: 0.88rem; color: var(--sub); line-height: 1.5; }
+  #updated { font-size: 0.78rem; color: var(--mute); margin: 10px 0 20px; }
+
+  .downloads { margin-bottom: 20px; }
+  a.dl-btn {
+    display: inline-block; background: var(--maroon); color: #fff; text-decoration: none;
+    border-radius: 8px; padding: 9px 20px; font-size: 0.9rem; font-weight: 600;
+  }
+  a.dl-btn:hover { background: #6f0710; }
 
   footer {
-    max-width: 900px; margin: 0 auto; padding: 14px 16px 30px;
+    max-width: 1200px; margin: 0 auto; padding: 14px 16px 30px;
     border-top: 1px solid var(--line);
   }
   .footer-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
@@ -45,27 +49,17 @@
 </style>
 </head>
 <body>
-  <header>
-    <h1>RUAO Infographics</h1>
-    <p>Reading University Atmospheric Observatory · regenerated daily from the live record</p>
-  </header>
-
   <main>
-    <a class="card" href="hot_days_1976/">
-      <h2>2026 vs 1976 — a hot, dry, sunny summer?</h2>
-      <p>Compares this year against the iconic summer of 1976 on three fronts —
-      30°C+ days, rain-free days, and hours of bright sunshine — with each
-      ranked against every other year and set against the long-term decade
-      trend.</p>
-    </a>
+    <p class="back"><a href="../">&larr; All infographics</a></p>
 
-    <a class="card" href="summer_worm/">
-      <h2>How does 2026 compare to the hottest summers on record?</h2>
-      <p>A cricket-worm style running average of daily mean temperature from
-      1 June, tracking 2026 day by day against the five hottest summers on
-      record (2025, 2018, 2022, 2006, 1947) plus 1976, added for its
-      significance.</p>
-    </a>
+    <div class="combined">
+      <img src="summer_worm.png" alt="How does 2026 compare to the hottest summers on record?">
+    </div>
+    <p id="updated"></p>
+
+    <div class="downloads">
+      <a class="dl-btn" href="summer_worm.png" download>Download</a>
+    </div>
   </main>
 
   <footer>
@@ -83,5 +77,13 @@
       </p>
     </div>
   </footer>
+
+  <script>
+    fetch('summer_worm.png', { method: 'HEAD' }).then(r => {
+      const lm = r.headers.get('last-modified');
+      if (lm) document.getElementById('updated').textContent =
+        'Last regenerated: ' + new Date(lm).toUTCString();
+    }).catch(() => {});
+  </script>
 </body>
 </html>
