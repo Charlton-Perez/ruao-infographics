@@ -145,7 +145,9 @@ def decade_bars(ax, series, title, ylabel, base_c, hi_c):
             txt = f"{v:.0f}"
             ax.text(b.get_x() + b.get_width() / 2, v + max(values) * 0.02, txt,
                     ha="center", va="bottom", fontsize=12, fontweight="bold", color=INK)
-    ax.set_title(title, loc="left", fontsize=17, fontweight="bold", color=INK, pad=13)
+    # Headroom above the tallest bar so the value labels don't crowd the title.
+    ax.set_ylim(0, max(values) * 1.12)
+    ax.set_title(title, loc="left", fontsize=17, fontweight="bold", color=INK, pad=26)
     ax.set_ylabel(ylabel, fontsize=12.5, color=SUB)
     style_axes(ax)
     return hi
