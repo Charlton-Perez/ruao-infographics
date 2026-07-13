@@ -60,6 +60,9 @@ BLOCKS = [
     (36, 999, "#8f1a0c"),
 ]
 BLOCK_LABELS = ["28–30", "30–32", "32–34", "34–36", "36 °C+"]
+# Bar chart of per-year counts: a muted brick red, deliberately OFF the
+# yellow→dark-red temperature ramp so it can't be mistaken for a heat block.
+BAR_COLOR = "#9c3f36"
 
 
 def block_color(tx):
@@ -118,56 +121,74 @@ def build():
     year_min = int(df["date"].dt.year.min())
     year_max = int(df["date"].dt.year.max())
 
-    # ── Figure ────────────────────────────────────────────────────────────────
-    fig = plt.figure(figsize=(13, 15.5), dpi=130)
+    n_years = year_max - year_min + 1
+    # Heatwave days per year — for the bar chart underneath the calendar.
+    per_year = hw.groupby(hw["date"].dt.year).size().reindex(
+        range(year_min, year_max + 1), fill_value=0)
+    decades = [y for y in range(year_min - year_min % 10, year_max + 1, 10) if y >= year_min]
+
+    # ── Figure: calendar heatmap (top) + per-year day-count bars (bottom) ──────
+    fig = plt.figure(figsize=(13, 12.5), dpi=130)
     fig.patch.set_facecolor(BG)
-    ax = fig.add_axes([0.075, 0.055, 0.86, 0.80])
-    ax.set_facecolor(BG)
+    gs = fig.add_gridspec(2, 1, height_ratios=[3.3, 1.0], hspace=0.06,
+                          left=0.075, right=0.935, top=0.845, bottom=0.085)
+    ax = fig.add_subplot(gs[0])                 # calendar
+    axb = fig.add_subplot(gs[1], sharex=ax)     # per-year bars
+    ax.set_facecolor(BG); axb.set_facecolor(BG)
 
+    # ── Calendar heatmap ──────────────────────────────────────────────────────
     # Faint season canvas so the (mostly empty) grid still reads as a calendar.
-    ax.add_patch(Rectangle((year_min - 0.5, 0.5), (year_max - year_min) + 1, SEASON_DAYS,
+    ax.add_patch(Rectangle((year_min - 0.5, 0.5), n_years, SEASON_DAYS,
                            facecolor="#f1ece3", edgecolor="none", zorder=0))
-
-    pad = 0.06
+    px, py = 0.12, 0.10   # small gaps so consecutive days read as distinct cells
     for _, r in hw.iterrows():
         yr, d = int(r["date"].year), int(r["doy"])
-        ax.add_patch(Rectangle((yr - 0.5 + pad / 2, d - 0.5 + pad / 2), 1 - pad, 1 - pad,
+        ax.add_patch(Rectangle((yr - 0.5 + px / 2, d - 0.5 + py / 2), 1 - px, 1 - py,
                                facecolor=block_color(r["Tx"]), edgecolor="none", zorder=3))
 
-    # Month gridlines + labels on the y-axis
     month_days = {1: "1 May", 32: "1 Jun", 62: "1 Jul", 93: "1 Aug", 124: "1 Sep", 153: "30 Sep"}
     for d in (32, 62, 93, 124):
         ax.axhline(d - 0.5, color=GRID, linewidth=0.8, zorder=1)
-    ax.set_yticks(list(month_days.keys()))
-    ax.set_yticklabels(list(month_days.values()), fontsize=10.5, color=SUB)
-
-    # Decade guides + labels on the x-axis
-    decades = [y for y in range(year_min - year_min % 10, year_max + 1, 10) if y >= year_min]
     for y in decades:
         ax.axvline(y - 0.5, color=GRID, linewidth=0.8, zorder=1)
-    ax.set_xticks(decades)
-    ax.set_xticklabels([str(y) for y in decades], fontsize=10.5, color=SUB)
-
+    ax.set_yticks(list(month_days.keys()))
+    ax.set_yticklabels(list(month_days.values()), fontsize=10, color=SUB)
     ax.set_xlim(year_min - 0.5, year_max + 0.5)
     ax.set_ylim(0.5, SEASON_DAYS + 0.5)
-    ax.set_aspect("equal")   # true square per day
     for s in ("top", "right", "left"):
         ax.spines[s].set_visible(False)
     ax.spines["bottom"].set_color(SPINE)
-    ax.tick_params(colors=SUB, length=0)
+    ax.tick_params(axis="y", colors=SUB, length=0)
+    ax.tick_params(axis="x", labelbottom=False, length=0)  # bars below carry the year axis
+
+    # ── Per-year bar chart (shares the year axis) ─────────────────────────────
+    axb.bar(per_year.index, per_year.values, width=0.8, color=BAR_COLOR,
+            edgecolor="none", zorder=3)
+    for y in decades:
+        axb.axvline(y - 0.5, color=GRID, linewidth=0.8, zorder=1)
+    axb.set_ylim(0, max(int(per_year.max() * 1.15) + 1, 4))
+    axb.set_ylabel("heatwave days\nper year", fontsize=9.5, color=SUB)
+    axb.set_xticks(decades)
+    axb.set_xticklabels([str(y) for y in decades], fontsize=10, color=SUB)
+    axb.grid(axis="y", color=GRID, linewidth=0.8, zorder=0)
+    axb.set_axisbelow(True)
+    for s in ("top", "right", "left"):
+        axb.spines[s].set_visible(False)
+    axb.spines["bottom"].set_color(SPINE)
+    axb.tick_params(colors=SUB, length=0)
 
     # ── Header (aligned to the plot's left/right margins) ─────────────────────
-    head = fig.add_axes([0.075, 0.87, 0.86, 0.12]); head.axis("off")
+    head = fig.add_axes([0.075, 0.905, 0.86, 0.085]); head.axis("off")
     head.set_xlim(0, 1); head.set_ylim(0, 1)
-    head.text(0.0, 0.62, "A century of heatwaves at Reading", fontsize=24,
+    head.text(0.0, 0.55, "A century of heatwaves at Reading", fontsize=23,
               fontweight="bold", color=INK)
-    head.text(0.0, 0.22,
+    head.text(0.0, 0.05,
               "Every heatwave day since records began — Met Office definition: daily maximum ≥ 28 °C for 3+ consecutive days",
-              fontsize=12.5, color=SUB)
+              fontsize=12, color=SUB)
     place_corner_logo(head)
 
-    # ── Legend (temperature blocks) ───────────────────────────────────────────
-    leg = fig.add_axes([0.075, 0.845, 0.86, 0.03]); leg.axis("off")
+    # ── Legend (temperature blocks) — clear of the plot ───────────────────────
+    leg = fig.add_axes([0.075, 0.862, 0.86, 0.03]); leg.axis("off")
     leg.set_xlim(0, 1); leg.set_ylim(0, 1)
     leg.text(0.0, 0.5, "Daily maximum (°C):", va="center", fontsize=10.5,
              color=SUB, fontweight="bold")
@@ -178,12 +199,12 @@ def build():
         x += 0.115
 
     # ── Footer ────────────────────────────────────────────────────────────────
-    fig.text(0.075, 0.032,
+    fig.text(0.075, 0.038,
              f"Data collected by the University of Reading  ·  {OBS_URL}",
              fontsize=9.5, color=SUB)
-    fig.text(0.075, 0.014,
+    fig.text(0.075, 0.020,
              f"Generated {date.today():%d %b %Y}  ·  Daily record {coverage(df)}  ·  "
-             f"{year_max} shown to date. Each square = one heatwave day.",
+             f"{year_max} shown to date. Each cell = one heatwave day.",
              fontsize=8.5, color=MUTE)
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
