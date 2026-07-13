@@ -185,7 +185,11 @@ def square_rank(ax, order, title, ylabel, sq_color, record_year, current_year,
     ax.set_title(title, loc="left", fontsize=17, fontweight="bold", color=INK, pad=13)
     ax.set_ylabel(ylabel, fontsize=12.5, color=SUB)
     style_axes(ax)
-    # legend chips along the top
+    # legend chips along the top — when the current year has become the record
+    # holder, its coloured "record" chip already stands for it, so drop the grey
+    # "so far" chip rather than list the same year twice.
+    if record_year == current_year:
+        legend = [(c, lbl) for c, lbl in legend if c != CURRENT]
     step = len(years) / 3.2
     for i, (c, label) in enumerate(legend):
         ax.add_patch(Rectangle((0.05 + i * step, ymax - 1.4), 0.45, 0.7,
