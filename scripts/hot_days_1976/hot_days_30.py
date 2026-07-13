@@ -144,9 +144,9 @@ def decade_bars(ax, series, title, ylabel, base_c, hi_c):
         if v > 0:
             txt = f"{v:.0f}"
             ax.text(b.get_x() + b.get_width() / 2, v + max(values) * 0.02, txt,
-                    ha="center", va="bottom", fontsize=10, fontweight="bold", color=INK)
-    ax.set_title(title, loc="left", fontsize=14.5, fontweight="bold", color=INK, pad=8)
-    ax.set_ylabel(ylabel, fontsize=10.5, color=SUB)
+                    ha="center", va="bottom", fontsize=12, fontweight="bold", color=INK)
+    ax.set_title(title, loc="left", fontsize=17, fontweight="bold", color=INK, pad=8)
+    ax.set_ylabel(ylabel, fontsize=12.5, color=SUB)
     style_axes(ax)
     return hi
 
@@ -166,29 +166,29 @@ def square_rank(ax, order, title, ylabel, sq_color, record_year, current_year,
         for j in range(cnt):
             ax.add_patch(Rectangle((xi - w / 2, j + gap / 2), w, 1 - gap,
                                    facecolor=fc, edgecolor=BG, linewidth=0.7, zorder=3))
-        ax.text(xi, cnt + 0.4, str(cnt), ha="center", va="bottom", fontsize=10, fontweight="bold",
+        ax.text(xi, cnt + 0.4, str(cnt), ha="center", va="bottom", fontsize=12, fontweight="bold",
                 color=rec_c if yr == record_year else (CURRENT if yr == current_year else INK))
     ymax = max(counts) + 4
     ax.axhline(record_count, color=rec_c, linestyle=(0, (5, 4)), linewidth=1.3, zorder=2)
     ax.text(len(years) - 0.55, record_count, record_label, ha="right", va="center",
-            fontsize=10.5, fontweight="bold", color=rec_c, zorder=6,
+            fontsize=12.5, fontweight="bold", color=rec_c, zorder=6,
             bbox=dict(facecolor=BG, edgecolor="none", pad=1.5, alpha=0.9))
     ax.set_xlim(-0.7, len(years) - 0.3)
     ax.set_ylim(0, ymax)
     ax.set_xticks(range(len(years)))
-    ax.set_xticklabels([str(y) for y in years], rotation=45, ha="right", fontsize=9.5, color=SUB)
+    ax.set_xticklabels([str(y) for y in years], rotation=45, ha="right", fontsize=12, color=SUB)
     for lbl, yr in zip(ax.get_xticklabels(), years):
         if yr == record_year: lbl.set_color(rec_c); lbl.set_fontweight("bold")
         elif yr == current_year: lbl.set_color(CURRENT); lbl.set_fontweight("bold")
-    ax.set_title(title, loc="left", fontsize=14.5, fontweight="bold", color=INK, pad=8)
-    ax.set_ylabel(ylabel, fontsize=10.5, color=SUB)
+    ax.set_title(title, loc="left", fontsize=17, fontweight="bold", color=INK, pad=8)
+    ax.set_ylabel(ylabel, fontsize=12.5, color=SUB)
     style_axes(ax)
     # legend chips along the top
     step = len(years) / 3.2
     for i, (c, label) in enumerate(legend):
         ax.add_patch(Rectangle((0.05 + i * step, ymax - 1.4), 0.45, 0.7,
                                facecolor=c, edgecolor=BG, zorder=5))
-        ax.text(0.62 + i * step, ymax - 1.05, label, va="center", fontsize=8.6, color=INK)
+        ax.text(0.62 + i * step, ymax - 1.05, label, va="center", fontsize=11, color=INK)
     if annotate:
         annotate(ax, years, counts, ymax)
 
@@ -294,7 +294,7 @@ def build():
                 tx, ha, clear = xr - 0.5, "right", _side_max(counts, xi - 4, xi)
             ty = min(max(mid, clear + 2.0), hot_record - 0.5)
             ax.text(tx, ty, f"{need} more\nto break ’76", ha=ha, va="center",
-                    fontsize=9.5, color="#5a5f66", fontweight="bold")
+                    fontsize=12, color="#5a5f66", fontweight="bold")
 
     def dry_annot(ax, years, counts, ymax):
         if current_year in years and cur_rain > dry_record:
@@ -303,7 +303,7 @@ def build():
             ty = min(max(cur_rain + 5.0, clear + 2.0), ymax - 1.5)
             # aim at the top of the 2026 column itself (not the neighbour), clear of its count label
             ax.annotate("already wetter\nthan ’76", xy=(xi + 0.05, cur_rain - 0.6), xytext=(xi + 0.95, ty),
-                        ha="left", va="center", fontsize=9, color="#5a5f66", fontweight="bold",
+                        ha="left", va="center", fontsize=12, color="#5a5f66", fontweight="bold",
                         arrowprops=dict(arrowstyle="-|>", color=CURRENT, lw=1.4))
 
     def sun_annot(ax, years, counts, ymax):
@@ -314,7 +314,7 @@ def build():
             clear = _side_max(counts, xi - 4, xi)
             ty = min(max(cur_bright + (ymax - cur_bright) * 0.45, clear + 2.0), ymax - 2.0)
             ax.annotate("far short\nof ’76", xy=(xi, cur_bright + 0.3), xytext=(xi + 0.4, ty),
-                        ha="right", va="center", fontsize=9, color="#5a5f66", fontweight="bold",
+                        ha="right", va="center", fontsize=12, color="#5a5f66", fontweight="bold",
                         arrowprops=dict(arrowstyle="-|>", color=CURRENT, lw=1.4))
 
     # ── The six panels, each a draw(ax) closure so they can go into the combined
@@ -348,14 +348,14 @@ def build():
     def draw_hot_dec(ax):
         decade_bars(ax, hot_dec, "30°C+ days per decade", "days per decade", HOT_BAR, HOT_HI)
         ax.text(0, -0.16, f"Incomplete {open_decade}s omitted; the {current_year // 10 * 10}s still in progress.",
-                transform=ax.transAxes, fontsize=9, color=MUTE, va="top")
+                transform=ax.transAxes, fontsize=11, color=MUTE, va="top")
 
     def draw_dry_dec(ax):
         decade_bars(ax, dry_dec, f"Average dry days per summer, per decade ({DRY_LABEL})",
                     "dry days per summer", DRY_BAR, DRY_HI)
         ax.text(0, -0.16,
                 f"Dry day = < {RAIN_DAY_MM:g} mm; scaled to a {DRY_WINDOW_DAYS}-day summer. Driest decade: the {driest_decade}s.",
-                transform=ax.transAxes, fontsize=9, color=MUTE, va="top")
+                transform=ax.transAxes, fontsize=11, color=MUTE, va="top")
 
     def draw_sun_dec(ax):
         decade_bars(ax, sun_dec, f"Average summer sunshine hours, per decade ({DRY_LABEL})",
@@ -363,7 +363,7 @@ def build():
         ax.text(0, -0.16,
                 f"Bright sunshine, scaled to a {DRY_WINDOW_DAYS}-day summer; recorded since {sun_start}. "
                 f"Sunniest decade: the {sunny_decade}s.",
-                transform=ax.transAxes, fontsize=9, color=MUTE, va="top")
+                transform=ax.transAxes, fontsize=11, color=MUTE, va="top")
 
     # Ordered: rankings (top row) then decades (bottom row). label/col drive the
     # HOT/DRY/SUNNY header on the combined figure only.
@@ -381,12 +381,12 @@ def build():
                           left=0.045, right=0.975, top=0.965, bottom=0.12)
 
     head = fig.add_subplot(gs[0, :]); head.axis("off")
-    head.text(0, 0.74, "2026 vs 1976 — a hot, dry, sunny summer?", fontsize=30, fontweight="bold", color=INK)
+    head.text(0, 0.74, "2026 vs 1976 — a hot, dry, sunny summer?", fontsize=33, fontweight="bold", color=INK)
     head.text(0, 0.30,
               "Reading University Atmospheric Observatory — the summer of ’76 as the benchmark",
-              fontsize=13.5, color=SUB)
+              fontsize=16, color=SUB)
     head.text(0, 0.00, f"Daily record {coverage(df)}  ·  sunshine recorded since {sun_start}",
-              fontsize=10.5, color=MUTE)
+              fontsize=12.5, color=MUTE)
     place_corner_logo(head)
 
     rank_axes = []
@@ -400,17 +400,17 @@ def build():
         p = ax.get_position()
         cx = (p.x0 + p.x1) / 2
         fig.text(cx, p.y1 + 0.032, label, ha="center", va="bottom",
-                 fontsize=19, fontweight="bold", color=colr, family="sans-serif")
+                 fontsize=23, fontweight="bold", color=colr, family="sans-serif")
         fig.add_artist(plt.Line2D([p.x0, p.x1], [p.y1 + 0.027, p.y1 + 0.027],
                                   color=colr, linewidth=2.2, alpha=0.5))
 
     foot = fig.text(0.06, 0.028,
-                    f"Data collected by the University of Reading  ·  {OBS_URL}", fontsize=10, color=SUB)
+                    f"Data collected by the University of Reading  ·  {OBS_URL}", fontsize=12, color=SUB)
     foot.set_url(OBS_URL)
     fig.text(0.06, 0.013,
              f"Generated {date.today():%d %b %Y}  ·  fewest rain days uses {DRY_LABEL}; {current_year} is a partial summer "
              f"(to {df['date'].max():%d %b}) so its rain-day count will still rise.",
-             fontsize=8.5, color=MUTE)
+             fontsize=11, color=MUTE)
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(OUT, facecolor=BG)

@@ -152,7 +152,7 @@ def build():
     for y in decades:
         ax.axvline(y - 0.5, color=GRID, linewidth=0.8, zorder=1)
     ax.set_yticks(list(month_days.keys()))
-    ax.set_yticklabels(list(month_days.values()), fontsize=10, color=SUB)
+    ax.set_yticklabels(list(month_days.values()), fontsize=12, color=SUB)
     ax.set_xlim(year_min - 0.5, year_max + 0.5)
     ax.set_ylim(0.5, SEASON_DAYS + 0.5)
     for s in ("top", "right", "left"):
@@ -167,9 +167,9 @@ def build():
     for y in decades:
         axb.axvline(y - 0.5, color=GRID, linewidth=0.8, zorder=1)
     axb.set_ylim(0, max(int(per_year.max() * 1.15) + 1, 4))
-    axb.set_ylabel("heatwave days\nper year", fontsize=9.5, color=SUB)
+    axb.set_ylabel("heatwave days\nper year", fontsize=12, color=SUB)
     axb.set_xticks(decades)
-    axb.set_xticklabels([str(y) for y in decades], fontsize=10, color=SUB)
+    axb.set_xticklabels([str(y) for y in decades], fontsize=12, color=SUB)
     axb.grid(axis="y", color=GRID, linewidth=0.8, zorder=0)
     axb.set_axisbelow(True)
     for s in ("top", "right", "left"):
@@ -180,32 +180,32 @@ def build():
     # ── Header (aligned to the plot's left/right margins) ─────────────────────
     head = fig.add_axes([0.075, 0.905, 0.86, 0.085]); head.axis("off")
     head.set_xlim(0, 1); head.set_ylim(0, 1)
-    head.text(0.0, 0.55, "A century of heatwaves at Reading", fontsize=23,
+    head.text(0.0, 0.55, "A century of heatwaves at Reading", fontsize=25,
               fontweight="bold", color=INK)
     head.text(0.0, 0.05,
               "Every heatwave day since records began — Met Office definition: daily maximum ≥ 28 °C for 3+ consecutive days",
-              fontsize=12, color=SUB)
+              fontsize=13.5, color=SUB)
     place_corner_logo(head)
 
     # ── Legend (temperature blocks) — clear of the plot ───────────────────────
     leg = fig.add_axes([0.075, 0.862, 0.86, 0.03]); leg.axis("off")
     leg.set_xlim(0, 1); leg.set_ylim(0, 1)
-    leg.text(0.0, 0.5, "Daily maximum (°C):", va="center", fontsize=10.5,
+    leg.text(0.0, 0.5, "Daily maximum (°C):", va="center", fontsize=12.5,
              color=SUB, fontweight="bold")
     x = 0.16
     for (lo, hi, c), label in zip(BLOCKS, BLOCK_LABELS):
         leg.add_patch(Rectangle((x, 0.15), 0.022, 0.7, facecolor=c, edgecolor=BG, linewidth=0.5))
-        leg.text(x + 0.03, 0.5, label, va="center", fontsize=10, color=INK)
+        leg.text(x + 0.03, 0.5, label, va="center", fontsize=12, color=INK)
         x += 0.115
 
     # ── Footer ────────────────────────────────────────────────────────────────
     fig.text(0.075, 0.038,
              f"Data collected by the University of Reading  ·  {OBS_URL}",
-             fontsize=9.5, color=SUB)
+             fontsize=11, color=SUB)
     fig.text(0.075, 0.020,
              f"Generated {date.today():%d %b %Y}  ·  Daily record {coverage(df)}  ·  "
              f"{year_max} shown to date. Each cell = one heatwave day.",
-             fontsize=8.5, color=MUTE)
+             fontsize=10.5, color=MUTE)
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(OUT, facecolor=BG)

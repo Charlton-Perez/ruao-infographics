@@ -177,7 +177,7 @@ def build():
         if abs(ylabel - yend) > 0.03:
             ax.plot([xend + 0.3, lx - 0.4], [yend, ylabel], color=color, linewidth=0.8,
                     alpha=0.55, zorder=2)
-        ax.text(lx, ylabel, f"{yr}  {yend:.1f}°C", va="center", fontsize=9.5,
+        ax.text(lx, ylabel, f"{yr}  {yend:.1f}°C", va="center", fontsize=11.5,
                 color=color, fontweight="bold")
 
     if len(cur_days):
@@ -187,16 +187,16 @@ def build():
         ax.annotate(
             f"{current_year} so far\n{cur_cum[-1]:.1f}°C (to {last_date:%d %b})",
             xy=(cur_days[-1], cur_cum[-1]), xytext=(cur_days[-1] + 2, cur_cum[-1] + 1.1),
-            fontsize=10, fontweight="bold", color=CURRENT_COLOR, va="center",
+            fontsize=12, fontweight="bold", color=CURRENT_COLOR, va="center",
             arrowprops=dict(arrowstyle="-|>", color=CURRENT_COLOR, lw=1.3))
 
     # Month tick marks on the day-of-summer axis (Jun/Jul/Aug each start 30/31 days apart)
     month_starts = [1, 31, 61, 92]
     month_labels = ["1 Jun", "1 Jul", "1 Aug", "31 Aug"]
     ax.set_xticks(month_starts)
-    ax.set_xticklabels(month_labels, fontsize=10.5, color=SUB)
+    ax.set_xticklabels(month_labels, fontsize=12.5, color=SUB)
     ax.set_xlim(1, 92 + 13)   # extra room on the right for end-of-line labels
-    ax.set_ylabel("running average daily temperature (°C)", fontsize=11, color=SUB)
+    ax.set_ylabel("running average daily temperature (°C)", fontsize=12.5, color=SUB)
     ax.grid(axis="y", color=GRID, zorder=0)
     ax.set_axisbelow(True)
     for s in ("top", "right", "left"):
@@ -208,20 +208,20 @@ def build():
     head_ax = fig.add_axes([0.0, 0.84, 1.0, 0.16]); head_ax.axis("off")
     head_ax.set_xlim(0, 1); head_ax.set_ylim(0, 1)
     head_ax.text(0.06, 0.58, f"How does {current_year} compare to the hottest summers on record?",
-                 fontsize=19.5, fontweight="bold", color=INK)
+                 fontsize=22, fontweight="bold", color=INK)
     head_ax.text(0.06, 0.14,
                  "Running average of daily mean temperature (Tx+Tn)/2, 1 June to today — like a cricket run-rate worm",
-                 fontsize=11.5, color=SUB)
+                 fontsize=13.5, color=SUB)
     place_corner_logo(head_ax)
 
     # ── Footer ───────────────────────────────────────────────────────────────
     fig.text(0.08, 0.045,
              f"Data collected by the University of Reading  ·  {OBS_URL}",
-             fontsize=9.5, color=SUB)
+             fontsize=11, color=SUB)
     fig.text(0.08, 0.025,
              f"Generated {date.today():%d %b %Y}  ·  Daily record {coverage(df)}  ·  "
              f"Benchmark summers: top 5 by mean Jun–Aug temperature, plus 1976.",
-             fontsize=8.5, color=MUTE)
+             fontsize=10.5, color=MUTE)
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(OUT, facecolor=BG)
