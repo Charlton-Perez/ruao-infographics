@@ -145,7 +145,7 @@ def decade_bars(ax, series, title, ylabel, base_c, hi_c):
             txt = f"{v:.0f}"
             ax.text(b.get_x() + b.get_width() / 2, v + max(values) * 0.02, txt,
                     ha="center", va="bottom", fontsize=12, fontweight="bold", color=INK)
-    ax.set_title(title, loc="left", fontsize=17, fontweight="bold", color=INK, pad=8)
+    ax.set_title(title, loc="left", fontsize=17, fontweight="bold", color=INK, pad=13)
     ax.set_ylabel(ylabel, fontsize=12.5, color=SUB)
     style_axes(ax)
     return hi
@@ -180,7 +180,7 @@ def square_rank(ax, order, title, ylabel, sq_color, record_year, current_year,
     for lbl, yr in zip(ax.get_xticklabels(), years):
         if yr == record_year: lbl.set_color(rec_c); lbl.set_fontweight("bold")
         elif yr == current_year: lbl.set_color(CURRENT); lbl.set_fontweight("bold")
-    ax.set_title(title, loc="left", fontsize=17, fontweight="bold", color=INK, pad=8)
+    ax.set_title(title, loc="left", fontsize=17, fontweight="bold", color=INK, pad=13)
     ax.set_ylabel(ylabel, fontsize=12.5, color=SUB)
     style_axes(ax)
     # legend chips along the top
@@ -399,9 +399,9 @@ def build():
     for ax, label, colr in rank_axes:
         p = ax.get_position()
         cx = (p.x0 + p.x1) / 2
-        fig.text(cx, p.y1 + 0.032, label, ha="center", va="bottom",
+        fig.text(cx, p.y1 + 0.050, label, ha="center", va="bottom",
                  fontsize=23, fontweight="bold", color=colr, family="sans-serif")
-        fig.add_artist(plt.Line2D([p.x0, p.x1], [p.y1 + 0.027, p.y1 + 0.027],
+        fig.add_artist(plt.Line2D([p.x0, p.x1], [p.y1 + 0.045, p.y1 + 0.045],
                                   color=colr, linewidth=2.2, alpha=0.5))
 
     foot = fig.text(0.06, 0.028,
