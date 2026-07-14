@@ -58,6 +58,7 @@ TOP_N_DRY = 13
 TOP_N_SUN = 13
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 OUT = REPO_ROOT / "docs" / "hot_days_1976" / "hot_days_30.png"
+PRORATA_OUT = REPO_ROOT / "docs" / "hot_days_1976" / "pro_rata_summer.png"
 ASSETS = Path(__file__).resolve().parent / "assets"
 OBS_URL = "https://research.reading.ac.uk/meteorology/atmospheric-observatory/"
 
@@ -275,6 +276,19 @@ def build():
     sun_order = [(int(y), int(c)) for y, c in sun_ranked.sort_values(ascending=False).items()]
     sun_record_year, sun_record = sun_order[0]
 
+    # ── Pro-rata projections: 2026's rate-so-far scaled up to a full 92-day
+    #    summer, for a second pair of figures ("what if this pace continued").
+    #    Kept fully separate from the actual to-date rankings above.
+    days_dry_so_far = int(cur_summer["RR"].notna().sum())
+    proj_rain = round(cur_rain / days_dry_so_far * DRY_WINDOW_DAYS) if days_dry_so_far else cur_rain
+    dry_order_proj = [(y, c) for y, c in dry_order if y != current_year] + [(current_year, proj_rain)]
+    dry_order_proj.sort(key=lambda t: t[1])
+
+    days_sun_so_far = int(cur_summer["sss"].notna().sum())
+    proj_bright = round(cur_bright / days_sun_so_far * DRY_WINDOW_DAYS) if days_sun_so_far else cur_bright
+    sun_order_proj = [(y, c) for y, c in sun_order if y != current_year] + [(current_year, proj_bright)]
+    sun_order_proj.sort(key=lambda t: t[1], reverse=True)
+
     driest_decade = int(dry_dec.idxmax())
     sunny_decade  = int(sun_dec.idxmax())
 
@@ -323,6 +337,34 @@ def build():
                         ha="right", va="center", fontsize=12, color="#5a5f66", fontweight="bold",
                         arrowprops=dict(arrowstyle="-|>", color=CURRENT, lw=1.4))
 
+    # Both projection annotations cap their label below ymax-2.6 — clear of the
+    # legend row (which occupies roughly [ymax-1.7, ymax-0.7]) — since the
+    # projected value sits much higher than the "so far" count and can otherwise
+    # land right in the legend's vertical band.
+    def dry_annot_proj(ax, years, counts, ymax):
+        # The projected value is usually the wettest of all (so pushed to the far
+        # right of the ranking) — label to its LEFT, never to the right, so it
+        # can't overflow the axes into the neighbouring subplot.
+        if current_year in years and proj_rain > dry_record:
+            xi = years.index(current_year)
+            clear = _side_max(counts, max(0, xi - 4), xi)
+            ty = min(max(proj_rain + 3.0, clear + 2.0), ymax - 2.6)
+            ax.annotate("still wetter\nthan ’76", xy=(xi - 0.05, proj_rain - 0.6), xytext=(xi - 0.95, ty),
+                        ha="right", va="center", fontsize=12, color="#5a5f66", fontweight="bold",
+                        arrowprops=dict(arrowstyle="-|>", color=CURRENT, lw=1.4))
+
+    def sun_annot_proj(ax, years, counts, ymax):
+        if current_year in years:
+            xi = years.index(current_year)
+            # The 1976-record dashed line spans the full panel width at y=sun_record,
+            # so the label must sit clearly above it (and below the legend row at
+            # ymax-1.4), not at some offset from the bar that might land on the line.
+            safe_lo, safe_hi = sun_record + 0.6, ymax - 1.9
+            ty = (safe_lo + safe_hi) / 2 if safe_hi > safe_lo else ymax - 3.5
+            ax.annotate("still short of ’76", xy=(xi, proj_bright + 1.3), xytext=(xi + 0.8, ty),
+                        ha="right", va="center", fontsize=11.5, color="#5a5f66", fontweight="bold",
+                        arrowprops=dict(arrowstyle="-|>", color=CURRENT, lw=1.4))
+
     # ── The six panels, each a draw(ax) closure so they can go into the combined
     #    figure OR be rendered on their own ──────────────────────────────────────
     def draw_hot_rank(ax):
@@ -350,6 +392,24 @@ def build():
                     [(SUN_REC_FILL, f"{sun_record_year} ({sun_record})"),
                      (CURRENT, f"{current_year} so far ({cur_bright})"),
                      (SUN_SQ, "other years")], annotate=sun_annot, rec_c=SUN_REC, rec_fill=SUN_REC_FILL)
+
+    def draw_dry_rank_proj(ax):
+        square_rank(ax, dry_order_proj, f"Driest summers ranked by fewest rain days ({DRY_LABEL})",
+                    f"each square = one rain day (≥ {RAIN_DAY_MM:g} mm)",
+                    DRY_SQ, dry_record_year, current_year, dry_record,
+                    f"{dry_record_year} record: {dry_record}",
+                    [(DRY_REC, f"{dry_record_year} ({dry_record})"),
+                     (CURRENT, f"{current_year} projected ({proj_rain})"),
+                     (DRY_SQ, "other years")], annotate=dry_annot_proj, rec_c=DRY_REC)
+
+    def draw_sun_rank_proj(ax):
+        square_rank(ax, sun_order_proj, f"Sunniest summers ranked by very sunny days ({DRY_LABEL})",
+                    f"each square = one day ≥ {SUN_BRIGHT_H:g} h of sunshine",
+                    SUN_SQ, sun_record_year, current_year, sun_record,
+                    f"{sun_record_year} record: {sun_record}",
+                    [(SUN_REC_FILL, f"{sun_record_year} ({sun_record})"),
+                     (CURRENT, f"{current_year} projected ({proj_bright})"),
+                     (SUN_SQ, "other years")], annotate=sun_annot_proj, rec_c=SUN_REC, rec_fill=SUN_REC_FILL)
 
     def draw_hot_dec(ax):
         decade_bars(ax, hot_dec, "30°C+ days per decade", "days per decade", HOT_BAR, HOT_HI)
@@ -428,6 +488,45 @@ def build():
     for key, label, colr, draw in RANKINGS + DECADES:
         size = (9, 5.2) if key.endswith("decade") else (9, 7.4)
         pf, pax = plt.subplots(figsize=size, dpi=130)
+        pf.patch.set_facecolor(BG)
+        draw(pax)
+        pf.savefig(pdir / f"{key}.png", facecolor=BG, bbox_inches="tight", pad_inches=0.28)
+        plt.close(pf)
+
+    # ── Pro-rata figure: same two rankings, but 2026 scaled from its rate-so-far
+    #    up to a full 92-day summer — "what if this pace continued all season".
+    #    Kept as a separate figure/story from the to-date six-panel above.
+    PRORATA = [("dry_ranking_prorata", DRY_HI, draw_dry_rank_proj),
+               ("sunny_ranking_prorata", SUN_HI, draw_sun_rank_proj)]
+
+    figp = plt.figure(figsize=(16, 8.4), dpi=120)
+    figp.patch.set_facecolor(BG)
+    gsp = figp.add_gridspec(2, 2, height_ratios=[0.85, 4.2], hspace=0.55, wspace=0.16,
+                            left=0.06, right=0.965, top=0.90, bottom=0.14)
+    headp = figp.add_subplot(gsp[0, :]); headp.axis("off")
+    headp.text(0, 0.62, "Scaling 2026 up to a full summer", fontsize=25, fontweight="bold", color=INK)
+    headp.text(0, 0.10,
+               f"If 2026's Jun–Aug rate so far ({days_dry_so_far} days observed) held for the full "
+               f"{DRY_WINDOW_DAYS}-day summer — same rankings, 2026 replaced with its projected pace",
+               fontsize=13, color=SUB)
+
+    for col, (key, colr, draw) in enumerate(PRORATA):
+        ax = figp.add_subplot(gsp[1, col]); draw(ax)
+
+    footp = figp.text(0.06, 0.038,
+                      f"Data collected by the University of Reading  ·  {OBS_URL}", fontsize=11, color=SUB)
+    footp.set_url(OBS_URL)
+    figp.text(0.06, 0.018,
+             f"Generated {date.today():%d %b %Y}  ·  projection = 2026's rate to {df['date'].max():%d %b} "
+             f"scaled linearly to a {DRY_WINDOW_DAYS}-day summer; not a forecast.",
+             fontsize=10.5, color=MUTE)
+
+    PRORATA_OUT.parent.mkdir(parents=True, exist_ok=True)
+    figp.savefig(PRORATA_OUT, facecolor=BG)
+    plt.close(figp)
+
+    for key, colr, draw in PRORATA:
+        pf, pax = plt.subplots(figsize=(9, 7.4), dpi=130)
         pf.patch.set_facecolor(BG)
         draw(pax)
         pf.savefig(pdir / f"{key}.png", facecolor=BG, bbox_inches="tight", pad_inches=0.28)

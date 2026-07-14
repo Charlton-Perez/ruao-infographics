@@ -27,6 +27,11 @@
   }
   #updated { font-size: 0.78rem; color: var(--mute); margin: 10px 0 20px; }
 
+  .section-title {
+    font-size: 1.4rem; margin: 8px 0 14px; color: var(--ink);
+  }
+  #updated-prorata { font-size: 0.78rem; color: var(--mute); margin: 10px 0 0; }
+
   .downloads {
     display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
     margin-bottom: 20px;
@@ -73,9 +78,18 @@
         <option value="panels/hot_decade.png">Hot — 30°C+ days per decade</option>
         <option value="panels/dry_decade.png">Dry — average dry days per decade</option>
         <option value="panels/sunny_decade.png">Sunny — average sunshine hours per decade</option>
+        <option value="pro_rata_summer.png">Pro-rata — 2026 scaled to a full summer (both panels)</option>
+        <option value="panels/dry_ranking_prorata.png">Pro-rata — driest summers (2026 scaled)</option>
+        <option value="panels/sunny_ranking_prorata.png">Pro-rata — sunniest summers (2026 scaled)</option>
       </select>
       <button id="dl-btn">Download</button>
     </div>
+
+    <h2 class="section-title">Scaling up to a full summer</h2>
+    <div class="combined">
+      <img src="pro_rata_summer.png" alt="Scaling 2026 up to a full summer — driest and sunniest summers ranked, with 2026 replaced by its projected pace">
+    </div>
+    <p id="updated-prorata"></p>
   </main>
 
   <footer>
@@ -98,6 +112,12 @@
     fetch('hot_days_30.png', { method: 'HEAD' }).then(r => {
       const lm = r.headers.get('last-modified');
       if (lm) document.getElementById('updated').textContent =
+        'Last regenerated: ' + new Date(lm).toUTCString();
+    }).catch(() => {});
+
+    fetch('pro_rata_summer.png', { method: 'HEAD' }).then(r => {
+      const lm = r.headers.get('last-modified');
+      if (lm) document.getElementById('updated-prorata').textContent =
         'Last regenerated: ' + new Date(lm).toUTCString();
     }).catch(() => {});
 
