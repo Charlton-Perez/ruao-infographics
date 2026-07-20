@@ -109,14 +109,17 @@ def build():
     # record break a run.
     hot = df["Tx"] >= HW_THRESHOLD
     breaks = (df["date"].diff().dt.days != 1) | (hot != hot.shift())
-    grp = breaks.cumsum()
-    run_len = df.groupby(grp)["date"].transform("size")
+    df["grp"] = breaks.cumsum()
+    run_len = df.groupby("grp")["date"].transform("size")
     df["hwday"] = hot & (run_len >= HW_MIN_DAYS)
 
-    hw = df[df["hwday"]].copy()
-    hw["doy"] = (hw["date"] - pd.to_datetime(
-        dict(year=hw["date"].dt.year, month=SEASON_START[0], day=SEASON_START[1]))).dt.days + 1
-    hw = hw[(hw["doy"] >= 1) & (hw["doy"] <= SEASON_DAYS)]
+    # hw_all keeps every heatwave day (incl. 'grp', the run id) so events can be
+    # counted correctly even in the rare case one dips outside the season window
+    # used for the calendar plot; hw is the doy-restricted subset for that plot.
+    hw_all = df[df["hwday"]].copy()
+    hw_all["doy"] = (hw_all["date"] - pd.to_datetime(
+        dict(year=hw_all["date"].dt.year, month=SEASON_START[0], day=SEASON_START[1]))).dt.days + 1
+    hw = hw_all[(hw_all["doy"] >= 1) & (hw_all["doy"] <= SEASON_DAYS)]
 
     year_min = int(df["date"].dt.year.min())
     year_max = int(df["date"].dt.year.max())
@@ -125,16 +128,25 @@ def build():
     # Heatwave days per year — for the bar chart underneath the calendar.
     per_year = hw.groupby(hw["date"].dt.year).size().reindex(
         range(year_min, year_max + 1), fill_value=0)
+    # Heatwave EVENTS per year — each 'grp' among heatwave days is one distinct
+    # spell (3+ consecutive days), attributed to the year its first day falls in.
+    event_year = hw_all.groupby("grp")["date"].min().dt.year
+    events_per_year = event_year.value_counts().sort_index().reindex(
+        range(year_min, year_max + 1), fill_value=0)
     decades = [y for y in range(year_min - year_min % 10, year_max + 1, 10) if y >= year_min]
 
-    # ── Figure: calendar heatmap (top) + per-year day-count bars (bottom) ──────
-    fig = plt.figure(figsize=(13, 12.5), dpi=130)
+    # ── Figure: calendar heatmap + per-year day-count bars + per-year event-count
+    #    bars, stacked. Figure height/margins are scaled up from the two-row
+    #    layout so the calendar and each bar row keep the same absolute size as
+    #    before, with the header/legend/footer chrome unchanged in inches.
+    fig = plt.figure(figsize=(13, 14.8), dpi=130)
     fig.patch.set_facecolor(BG)
-    gs = fig.add_gridspec(2, 1, height_ratios=[3.3, 1.0], hspace=0.06,
-                          left=0.075, right=0.935, top=0.845, bottom=0.085)
+    gs = fig.add_gridspec(3, 1, height_ratios=[3.3, 1.0, 1.0], hspace=0.06,
+                          left=0.075, right=0.935, top=0.869, bottom=0.072)
     ax = fig.add_subplot(gs[0])                 # calendar
-    axb = fig.add_subplot(gs[1], sharex=ax)     # per-year bars
-    ax.set_facecolor(BG); axb.set_facecolor(BG)
+    axb = fig.add_subplot(gs[1], sharex=ax)     # per-year day-count bars
+    axc = fig.add_subplot(gs[2], sharex=ax)     # per-year event-count bars
+    ax.set_facecolor(BG); axb.set_facecolor(BG); axc.set_facecolor(BG)
 
     # ── Calendar heatmap ──────────────────────────────────────────────────────
     # Faint season canvas so the (mostly empty) grid still reads as a calendar.
@@ -161,7 +173,7 @@ def build():
     ax.tick_params(axis="y", colors=SUB, length=0)
     ax.tick_params(axis="x", labelbottom=False, length=0)  # bars below carry the year axis
 
-    # ── Per-year bar chart (shares the year axis) ─────────────────────────────
+    # ── Per-year day-count bar chart (shares the year axis) ───────────────────
     axb.bar(per_year.index, per_year.values, width=0.8, color=BAR_COLOR,
             edgecolor="none", zorder=3)
     for y in decades:
@@ -169,16 +181,32 @@ def build():
     axb.set_ylim(0, max(int(per_year.max() * 1.15) + 1, 4))
     axb.set_ylabel("heatwave days\nper year", fontsize=12, color=SUB)
     axb.set_xticks(decades)
-    axb.set_xticklabels([str(y) for y in decades], fontsize=12, color=SUB)
     axb.grid(axis="y", color=GRID, linewidth=0.8, zorder=0)
     axb.set_axisbelow(True)
     for s in ("top", "right", "left"):
         axb.spines[s].set_visible(False)
     axb.spines["bottom"].set_color(SPINE)
-    axb.tick_params(colors=SUB, length=0)
+    axb.tick_params(axis="y", colors=SUB, length=0)
+    axb.tick_params(axis="x", labelbottom=False, length=0)  # events panel below carries the year axis
+
+    # ── Per-year event-count bar chart (each bar = distinct heatwave spells) ──
+    axc.bar(events_per_year.index, events_per_year.values, width=0.8, color=BAR_COLOR,
+            edgecolor="none", zorder=3)
+    for y in decades:
+        axc.axvline(y - 0.5, color=GRID, linewidth=0.8, zorder=1)
+    axc.set_ylim(0, max(int(events_per_year.max() * 1.15) + 1, 3))
+    axc.set_ylabel("heatwaves\nper year", fontsize=12, color=SUB)
+    axc.set_xticks(decades)
+    axc.set_xticklabels([str(y) for y in decades], fontsize=12, color=SUB)
+    axc.grid(axis="y", color=GRID, linewidth=0.8, zorder=0)
+    axc.set_axisbelow(True)
+    for s in ("top", "right", "left"):
+        axc.spines[s].set_visible(False)
+    axc.spines["bottom"].set_color(SPINE)
+    axc.tick_params(colors=SUB, length=0)
 
     # ── Header (aligned to the plot's left/right margins) ─────────────────────
-    head = fig.add_axes([0.075, 0.905, 0.86, 0.085]); head.axis("off")
+    head = fig.add_axes([0.075, 0.920, 0.86, 0.072]); head.axis("off")
     head.set_xlim(0, 1); head.set_ylim(0, 1)
     head.text(0.0, 0.55, "A century of heatwaves at Reading", fontsize=25,
               fontweight="bold", color=INK)
@@ -188,7 +216,7 @@ def build():
     place_corner_logo(head)
 
     # ── Legend (temperature blocks) — clear of the plot ───────────────────────
-    leg = fig.add_axes([0.075, 0.862, 0.86, 0.03]); leg.axis("off")
+    leg = fig.add_axes([0.075, 0.884, 0.86, 0.025]); leg.axis("off")
     leg.set_xlim(0, 1); leg.set_ylim(0, 1)
     leg.text(0.0, 0.5, "Daily maximum (°C):", va="center", fontsize=12.5,
              color=SUB, fontweight="bold")
@@ -199,10 +227,10 @@ def build():
         x += 0.115
 
     # ── Footer ────────────────────────────────────────────────────────────────
-    fig.text(0.075, 0.038,
+    fig.text(0.075, 0.032,
              f"Data collected by the University of Reading  ·  {OBS_URL}",
              fontsize=11, color=SUB)
-    fig.text(0.075, 0.020,
+    fig.text(0.075, 0.017,
              f"Generated {date.today():%d %b %Y}  ·  Daily record {coverage(df)}  ·  "
              f"{year_max} shown to date. Each cell = one heatwave day.",
              fontsize=10.5, color=MUTE)
@@ -213,6 +241,8 @@ def build():
 
     print(f"Wrote {OUT}")
     print(f"  Heatwave days plotted: {len(hw)}  ({year_min}–{year_max})")
+    print(f"  Heatwave events (spells): {len(event_year)}  ·  busiest year: "
+          f"{int(events_per_year.idxmax())} with {int(events_per_year.max())}")
     by_decade = (hw["date"].dt.year // 10 * 10).value_counts().sort_index()
     print(f"  Busiest decade: {int(by_decade.idxmax())}s with {int(by_decade.max())} heatwave days")
     if not (ASSETS / CORNER_LOGO).exists():
