@@ -59,6 +59,15 @@ TOP_N_SUN = 13
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 OUT = REPO_ROOT / "docs" / "hot_days_1976" / "hot_days_30.png"
 PRORATA_OUT = REPO_ROOT / "docs" / "hot_days_1976" / "pro_rata_summer.png"
+# A dedicated, smaller copy of the main figure for social-preview (og:image)
+# use only — the full-res 2880x1620 original is the only image on this site
+# wide enough to exceed ~2048px, the point at which some platforms' preview
+# image-resizing silently fails and falls back to grabbing an unrelated small
+# <img> off the page (confirmed: LinkedIn was doing exactly this). Re-rendered
+# from the same figure at a lower dpi rather than raster-resized, so it stays
+# sharp instead of resampled.
+SOCIAL_OUT = REPO_ROOT / "docs" / "hot_days_1976" / "hot_days_30_social.png"
+SOCIAL_WIDTH = 1600
 ASSETS = Path(__file__).resolve().parent / "assets"
 OBS_URL = "https://research.reading.ac.uk/meteorology/atmospheric-observatory/"
 
@@ -480,6 +489,8 @@ def build():
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(OUT, facecolor=BG)
+    social_dpi = SOCIAL_WIDTH / fig.get_figwidth()
+    fig.savefig(SOCIAL_OUT, facecolor=BG, dpi=social_dpi)
     plt.close(fig)
 
     # ── Each panel on its own (no overall title; cropped tight) ────────────────
@@ -533,6 +544,7 @@ def build():
         plt.close(pf)
 
     print(f"Wrote {OUT}")
+    print(f"  + social preview → {SOCIAL_OUT.name}")
     print(f"  + 6 separate panels → {pdir.relative_to(OUT.parent.parent)}/")
     print(f"  Hot record : {hot_record_year} ({hot_record}); {current_year} so far {hot_current}")
     print(f"  Driest summer ({DRY_LABEL}): {dry_record_year} ({dry_record} rain days); "
