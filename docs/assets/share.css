@@ -1,0 +1,23 @@
+/* Shared "Share" row — used on every infographic page alongside its Download
+   control. Assumes the page's own <style> already defines --ink/--bg/--sub/
+   --mute/--maroon/--line in :root (all infographic pages do). */
+.share {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  margin: 0 0 20px;
+}
+.share-label {
+  font-size: 0.85rem; color: var(--sub); font-weight: 600; margin-right: 2px;
+}
+.share-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #fff; color: var(--ink); border: 1px solid var(--line);
+  border-radius: 8px; padding: 7px 14px; font-size: 0.85rem; font-weight: 600;
+  cursor: pointer; text-decoration: none; font-family: inherit;
+  transition: border-color 0.15s, color 0.15s;
+}
+.share-btn:hover { border-color: var(--maroon); color: var(--maroon); }
+.share-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+.share-note {
+  font-size: 0.8rem; color: var(--sub); font-style: italic;
+}

@@ -4,6 +4,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>2026 vs the hottest summers on record | RUAO Infographics</title>
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://charlton-perez.github.io/ruao-infographics/summer_worm/">
+<meta property="og:title" content="How does 2026 compare to the hottest summers on record?">
+<meta property="og:description" content="A cricket-worm style running average of daily mean temperature from 1 June, tracking 2026 day by day against the five hottest summers on record plus 1976.">
+<meta property="og:image" content="https://charlton-perez.github.io/ruao-infographics/summer_worm/summer_worm.png">
+<meta property="og:image:width" content="1690">
+<meta property="og:image:height" content="1170">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="How does 2026 compare to the hottest summers on record?">
+<meta name="twitter:description" content="A cricket-worm style running average of daily mean temperature, tracking 2026 against the five hottest summers on record plus 1976.">
+<meta name="twitter:image" content="https://charlton-perez.github.io/ruao-infographics/summer_worm/summer_worm.png">
+
+<link rel="stylesheet" href="../assets/share.css">
 <style>
   :root {
     --ink: #2b2118; --bg: #faf7f2; --sub: #6a5c4c; --mute: #9a8c7a;
@@ -60,6 +74,14 @@
     <div class="downloads">
       <a class="dl-btn" href="summer_worm.png" download>Download</a>
     </div>
+
+    <div class="share">
+      <span class="share-label">Share:</span>
+      <button id="share-linkedin" class="share-btn" type="button">LinkedIn</button>
+      <button id="share-bluesky" class="share-btn" type="button">Bluesky</button>
+      <button id="share-instagram" class="share-btn" type="button">Instagram</button>
+      <span id="share-note" class="share-note" hidden></span>
+    </div>
   </main>
 
   <footer>
@@ -84,6 +106,15 @@
       if (lm) document.getElementById('updated').textContent =
         'Last regenerated: ' + new Date(lm).toUTCString();
     }).catch(() => {});
+  </script>
+  <script src="../assets/share.js"></script>
+  <script>
+    initShareButtons({
+      url: 'https://charlton-perez.github.io/ruao-infographics/summer_worm/',
+      title: 'How does 2026 compare to the hottest summers on record?',
+      text: 'How does 2026 compare to the hottest summers on record?',
+      image: 'https://charlton-perez.github.io/ruao-infographics/summer_worm/summer_worm.png',
+    });
   </script>
 </body>
 </html>
