@@ -110,7 +110,28 @@ def cumulative_rain_series(df, year):
     sub = sub.reindex(idx)
     has_data = sub.notna().values
     cum = sub.fillna(0).cumsum()
-    return np.arange(1, len(idx) + 1), cum.values, has_data
+    return np.arange(1, len(idx) + 1), cum.values, has_data, sub.values
+
+
+def longest_zero_rain_spell(days, cum, raw_rr):
+    """Longest run of consecutive OBSERVED zero-rain days (RR exactly 0mm —
+    the visually flat plateaus in the chart). A missing day breaks the run
+    rather than being assumed dry, since a gap in the record can't confirm
+    zero rain fell. Returns (start_day, end_day, length, y_level) for the
+    single longest such run, or None if there isn't one."""
+    dry = raw_rr == 0   # NaN == 0 is False, so missing days naturally break a run
+    best_len, best_start, best_end, run_start = 0, None, None, None
+    for i, is_dry in enumerate(dry):
+        if is_dry:
+            if run_start is None:
+                run_start = i
+            if i - run_start + 1 > best_len:
+                best_len, best_start, best_end = i - run_start + 1, run_start, i
+        else:
+            run_start = None
+    if best_start is None:
+        return None
+    return days[best_start], days[best_end], best_len, cum[best_start]
 
 
 def build():
@@ -130,9 +151,11 @@ def build():
 
     # ── Benchmark traces ───────────────────────────────────────────────────────
     benchmarks = []
+    raw_by_year = {}
     for yr in dry_years:
-        days, cum, has_data = cumulative_rain_series(df, int(yr))
+        days, cum, has_data, raw_rr = cumulative_rain_series(df, int(yr))
         benchmarks.append((int(yr), days, cum))
+        raw_by_year[int(yr)] = (days, cum, raw_rr)
 
     # Assign the dark->light palette by rank (driest = darkest); the highlight
     # year keeps its own colour regardless of where it falls.
@@ -147,12 +170,15 @@ def build():
         label_colors[HIGHLIGHT_YEAR] = HIGHLIGHT_COLOR
 
     # ── Current year trace (truncated to the last day actually observed) ─────
-    cur_days, cur_cum, cur_has_data = cumulative_rain_series(df, current_year)
+    # Full (untruncated) arrays are kept for the dry-spell bracket below — its
+    # raw RR series already has NaN past the last observation, which naturally
+    # stops any run from reaching into unmeasured future days.
+    cur_days_full, cur_cum_full, cur_has_data, cur_raw_full = cumulative_rain_series(df, current_year)
     if cur_has_data.any():
         last_i = np.where(cur_has_data)[0].max()
-        cur_days, cur_cum = cur_days[: last_i + 1], cur_cum[: last_i + 1]
+        cur_days, cur_cum = cur_days_full[: last_i + 1], cur_cum_full[: last_i + 1]
     else:
-        cur_days, cur_cum = cur_days[:0], cur_cum[:0]
+        cur_days, cur_cum = cur_days_full[:0], cur_cum_full[:0]
 
     # ── Figure ──────────────────────────────────────────────────────────────────
     fig = plt.figure(figsize=(13, 9), dpi=130)
@@ -208,6 +234,26 @@ def build():
             xy=(cur_days[-1], cur_cum[-1]), xytext=(cur_days[-1] + 2, cur_cum[-1] + 6),
             fontsize=12, fontweight="bold", color=CURRENT_COLOR, va="center",
             arrowprops=dict(arrowstyle="-|>", color=CURRENT_COLOR, lw=1.3))
+
+    # ── Longest dry-spell brackets: 1976's record run of zero-rain days, and
+    #    2026's longest so far — a double-headed bracket spanning the flat
+    #    plateau, hovering just above the line so it doesn't obscure it.
+    def draw_dry_spell_bracket(days, cum, raw_rr, color, y_gap=2.2):
+        spell = longest_zero_rain_spell(days, cum, raw_rr)
+        if not spell:
+            return
+        start, end, length, y = spell
+        yb = y + y_gap
+        ax.annotate("", xy=(end, yb), xytext=(start, yb),
+                    arrowprops=dict(arrowstyle="<->", color=color, lw=1.5), zorder=6)
+        ax.text((start + end) / 2, yb + 1.3, f"{length} days", ha="center", va="bottom",
+                fontsize=11, fontweight="bold", color=color, zorder=6,
+                bbox=dict(facecolor=BG, edgecolor="none", pad=1.5, alpha=0.92))
+
+    if HIGHLIGHT_YEAR in raw_by_year:
+        hy_days, hy_cum, hy_raw = raw_by_year[HIGHLIGHT_YEAR]
+        draw_dry_spell_bracket(hy_days, hy_cum, hy_raw, HIGHLIGHT_COLOR)
+    draw_dry_spell_bracket(cur_days_full, cur_cum_full, cur_raw_full, CURRENT_COLOR)
 
     # Month tick marks on the day-of-summer axis (Jun/Jul/Aug each start 30/31 days apart)
     month_starts = [1, 31, 61, 92]
