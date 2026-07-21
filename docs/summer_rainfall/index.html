@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The driest summers on record — how does 2026 compare? | RUAO Infographics</title>
+<style>
+  :root {
+    --ink: #2b2118; --bg: #faf7f2; --sub: #6a5c4c; --mute: #9a8c7a;
+    --maroon: #8e0915; --line: #e6ded4;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: Arial, Helvetica, "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 1200px; margin: 0 auto; padding: 24px 16px 20px; }
+
+  .back { font-size: 0.82rem; margin-bottom: 14px; }
+  .back a { color: var(--maroon); text-decoration: none; }
+  .back a:hover { text-decoration: underline; }
+
+  .combined img {
+    width: 100%; height: auto; display: block; border-radius: 8px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.08); background: #fff;
+  }
+  #updated { font-size: 0.78rem; color: var(--mute); margin: 10px 0 20px; }
+
+  .downloads { margin-bottom: 20px; }
+  a.dl-btn {
+    display: inline-block; background: var(--maroon); color: #fff; text-decoration: none;
+    border-radius: 8px; padding: 9px 20px; font-size: 0.9rem; font-weight: 600;
+  }
+  a.dl-btn:hover { background: #6f0710; }
+
+  footer {
+    max-width: 1200px; margin: 0 auto; padding: 14px 16px 30px;
+    border-top: 1px solid var(--line);
+  }
+  .footer-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .cc-link { flex-shrink: 0; line-height: 0; }
+  .cc-badge { height: 31px; width: auto; display: block; }
+  .footer-text {
+    flex: 1; min-width: 240px; font-size: 0.78rem; line-height: 1.55; color: var(--mute);
+  }
+  .footer-text a { color: var(--maroon); text-decoration: none; }
+  .footer-text a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+  <main>
+    <p class="back"><a href="../">&larr; All infographics</a></p>
+
+    <div class="combined">
+      <img src="summer_rainfall.png" alt="The driest summers on record — how does 2026 compare?">
+    </div>
+    <p id="updated"></p>
+
+    <div class="downloads">
+      <a class="dl-btn" href="summer_rainfall.png" download>Download</a>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-row">
+      <a class="cc-link" href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer"
+         title="Creative Commons Attribution 4.0 International">
+        <img class="cc-badge" src="assets/cc-by.png" alt="Creative Commons BY 4.0">
+      </a>
+      <p class="footer-text">
+        Data &amp; figures &copy; University of Reading, licensed under
+        <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC&nbsp;BY&nbsp;4.0</a>.
+        Data collected at the
+        <a href="https://research.reading.ac.uk/meteorology/atmospheric-observatory/" target="_blank" rel="noreferrer">Atmospheric Observatory</a>.
+        Beta — provided as is, with no warranty.
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    fetch('summer_rainfall.png', { method: 'HEAD' }).then(r => {
+      const lm = r.headers.get('last-modified');
+      if (lm) document.getElementById('updated').textContent =
+        'Last regenerated: ' + new Date(lm).toUTCString();
+    }).catch(() => {});
+  </script>
+</body>
+</html>
