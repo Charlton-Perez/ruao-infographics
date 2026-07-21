@@ -17,7 +17,3 @@
 }
 .share-btn:hover { border-color: var(--maroon); color: var(--maroon); }
 .share-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
-
-.share-note {
-  font-size: 0.8rem; color: var(--sub); font-style: italic;
-}
