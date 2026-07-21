@@ -17,3 +17,8 @@
 }
 .share-btn:hover { border-color: var(--maroon); color: var(--maroon); }
 .share-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+/* Author-stylesheet display:inline-flex above would otherwise beat the UA's
+   [hidden]{display:none} on specificity ties (equal specificity, author origin
+   wins) — this keeps the feature-detected native-share button truly hidden
+   until JS explicitly un-hides it. */
+.share-btn[hidden] { display: none; }
