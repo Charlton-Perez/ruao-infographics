@@ -256,7 +256,13 @@ def build():
     dry_record = int(driest["rain"].iloc[0])
     cur_summer = df[(df["year"] == current_year) & (df["month"].isin(DRY_MONTHS))]
     cur_rain = int((cur_summer["RR"] >= RAIN_DAY_MM).sum())
-    dry_order = [(int(y), int(c)) for y, c in driest["rain"].items()] + [(current_year, cur_rain)]
+    # Once enough of the current summer has been observed, it can pass the
+    # completeness filter above and already be sitting inside `driest` in its
+    # own right — append it only if it isn't already there, exactly like the
+    # SUNNY ranking below already does (this was the one guard missing here).
+    dry_order = [(int(y), int(c)) for y, c in driest["rain"].items()]
+    if current_year not in driest.index:
+        dry_order.append((current_year, cur_rain))
     dry_order.sort(key=lambda t: t[1])
 
     # ── SUNNY: per-decade summer sunshine + sunniest-summer ranking ───────────
@@ -336,15 +342,22 @@ def build():
                         arrowprops=dict(arrowstyle="-|>", color=CURRENT, lw=1.4))
 
     def sun_annot(ax, years, counts, ymax):
-        if current_year in years:
-            xi = years.index(current_year)
-            # 2026 is the lowest/right-most column; lift the label clear of the
-            # tall neighbours on its left and anchor it near the right edge.
-            clear = _side_max(counts, xi - 4, xi)
-            ty = min(max(cur_bright + (ymax - cur_bright) * 0.45, clear + 2.0), ymax - 2.0)
-            ax.annotate("far short\nof ’76", xy=(xi, cur_bright + 0.3), xytext=(xi + 0.4, ty),
-                        ha="right", va="center", fontsize=12, color="#5a5f66", fontweight="bold",
-                        arrowprops=dict(arrowstyle="-|>", color=CURRENT, lw=1.4))
+        if current_year not in years:
+            return
+        gap = sun_record - cur_bright
+        if gap <= 0:
+            return  # 2026 has met/passed the record — its own bar already says so, no stale "short of" text needed
+        xi = years.index(current_year)
+        # 2026 has been landing close enough to 1976 in the ranking that a
+        # bar-relative offset can put this label on the record's dashed line
+        # or in the legend above it — use the same safe-zone-between-the-two
+        # technique as sun_annot_proj instead of assuming 2026 sits low/right.
+        safe_lo, safe_hi = sun_record + 0.6, ymax - 1.9
+        ty = (safe_lo + safe_hi) / 2 if safe_hi > safe_lo else ymax - 3.5
+        label = f"{gap} day{'s' if gap != 1 else ''} short\nof ’76"
+        ax.annotate(label, xy=(xi, cur_bright + 1.3), xytext=(xi + 0.8, ty),
+                    ha="right", va="center", fontsize=12, color="#5a5f66", fontweight="bold",
+                    arrowprops=dict(arrowstyle="-|>", color=CURRENT, lw=1.4))
 
     # Both projection annotations cap their label below ymax-2.6 — clear of the
     # legend row (which occupies roughly [ymax-1.7, ymax-0.7]) — since the
@@ -363,16 +376,21 @@ def build():
                         arrowprops=dict(arrowstyle="-|>", color=CURRENT, lw=1.4))
 
     def sun_annot_proj(ax, years, counts, ymax):
-        if current_year in years:
-            xi = years.index(current_year)
-            # The 1976-record dashed line spans the full panel width at y=sun_record,
-            # so the label must sit clearly above it (and below the legend row at
-            # ymax-1.4), not at some offset from the bar that might land on the line.
-            safe_lo, safe_hi = sun_record + 0.6, ymax - 1.9
-            ty = (safe_lo + safe_hi) / 2 if safe_hi > safe_lo else ymax - 3.5
-            ax.annotate("still short of ’76", xy=(xi, proj_bright + 1.3), xytext=(xi + 0.8, ty),
-                        ha="right", va="center", fontsize=11.5, color="#5a5f66", fontweight="bold",
-                        arrowprops=dict(arrowstyle="-|>", color=CURRENT, lw=1.4))
+        if current_year not in years:
+            return
+        gap = sun_record - proj_bright
+        if gap <= 0:
+            return  # the projection has met/passed the record — its own bar already says so
+        xi = years.index(current_year)
+        # The 1976-record dashed line spans the full panel width at y=sun_record,
+        # so the label must sit clearly above it (and below the legend row at
+        # ymax-1.4), not at some offset from the bar that might land on the line.
+        safe_lo, safe_hi = sun_record + 0.6, ymax - 1.9
+        ty = (safe_lo + safe_hi) / 2 if safe_hi > safe_lo else ymax - 3.5
+        label = f"{gap} day{'s' if gap != 1 else ''} short of ’76"
+        ax.annotate(label, xy=(xi, proj_bright + 1.3), xytext=(xi + 0.8, ty),
+                    ha="right", va="center", fontsize=11.5, color="#5a5f66", fontweight="bold",
+                    arrowprops=dict(arrowstyle="-|>", color=CURRENT, lw=1.4))
 
     # ── The six panels, each a draw(ax) closure so they can go into the combined
     #    figure OR be rendered on their own ──────────────────────────────────────
